@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Entrar</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center;
+           padding-top: 80px; background: #f4f4f4; }
+    .box { background: #fff; padding: 30px; border-radius: 10px; width: 320px;
+           box-shadow: 0 2px 10px rgba(0,0,0,.1); text-align: center; }
+    input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+    button { width: 100%; padding: 12px; background: #007bff; color: #fff;
+             border: none; border-radius: 6px; cursor: pointer; font-size: 15px; }
+    button:disabled { background: #999; cursor: not-allowed; }
+    #msg { margin-top: 15px; font-size: 15px; font-weight: bold; min-height: 22px; }
+    .ok   { color: #28a745; }
+    .erro { color: #dc3545; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Digite a senha</h2>
+    <input type="password" id="senha" placeholder="Sua senha" autofocus>
+    <button id="btn">Entrar</button>
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    // 🔽 Cole aqui o hash gerado (SHA-256 de SALT + senha)
+    const HASH_ESPERADO = '10f03172ac19a3ea4c11dfcd71cf17307952c49a25857ec243051a59964ca085';
+    const SALT = 'meu-site-mapa-mental';
+
+    async function gerarHash(senha, salt = '') {
+      const texto = salt + senha;
+      const buf = await crypto.subtle.digest('SHA-256',
+        new TextEncoder().encode(texto));
+      return [...new Uint8Array(buf)]
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    const campo = document.getElementById('senha');
+    const btn   = document.getElementById('btn');
+    const msg   = document.getElementById('msg');
+
+    async function verificar() {
+      const digitada = campo.value;
+      const alvo = document.getElementById('msg');
+
+      // Limpa estado anterior
+      alvo.textContent = '';
+      alvo.className = '';
+
+      if (!digitada) {
+        alvo.textContent = 'Digite uma senha.';
+        alvo.classList.add('erro');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      const hash = await gerarHash(digitada, SALT);
+
+      if (hash === HASH_ESPERADO) {
+        // ✅ Senha correta
+        sessionStorage.setItem('autorizado', 'sim');   // 👈 adicione esta linha
+        alvo.textContent = '✅ Senha correta! Redirecionando...';
+        alvo.classList.add('ok');
+        btn.textContent = 'Correto!';
+        setTimeout(() => { window.location.href = 'protegida.html'; }, 1500);
+      } else {
+        // ❌ Senha incorreta
+        alvo.textContent = '❌ Senha incorreta. Tente novamente.';
+        alvo.classList.add('erro');
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        campo.value = '';
+        campo.focus();
+      }
+    }
+
+    btn.onclick = verificar;
+
+    // Enter também dispara a verificação
+    campo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') verificar();
+    });
+  </script>
+</body>
+</html>

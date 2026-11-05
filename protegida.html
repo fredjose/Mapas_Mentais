@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área Restrita</title>
+  <script>
+    // 🔒 Trava: só abre se veio do login
+    if (sessionStorage.getItem('autorizado') !== 'sim') {
+      window.location.href = 'login.html';
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #eef2f7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 20px; font-weight: 600; }
+    header h1 span { opacity: .7; font-weight: 400; font-size: 14px; }
+    .btn-sair {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background .2s;
+    }
+    .btn-sair:hover { background: #c0392b; }
+
+    .layout { display: flex; flex: 1; flex-wrap: wrap; }
+
+    aside {
+      width: 240px;
+      background: #fff;
+      padding: 20px 12px;
+      box-shadow: 2px 0 6px rgba(0,0,0,.05);
+    }
+    aside h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin: 16px 10px 8px;
+    }
+    aside h2:first-child { margin-top: 6px; }
+    aside a {
+      display: block;
+      padding: 9px 14px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background .15s, transform .1s;
+    }
+    aside a:hover {
+      background: #e8f0fe;
+      transform: translateX(3px);
+    }
+    aside a::before { content: '▸ '; color: #2a5298; }
+
+    main {
+      flex: 1;
+      padding: 30px;
+      min-width: 280px;
+    }
+    main h2 {
+      font-size: 22px;
+      color: #1e3c72;
+      margin-bottom: 6px;
+    }
+    main p.sub {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 26px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px 20px;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      transition: transform .15s, box-shadow .15s;
+      border-left: 5px solid #2a5298;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 120px;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    }
+    .card .icone { font-size: 28px; margin-bottom: 10px; }
+    .card .titulo { font-size: 16px; font-weight: 600; }
+    .card .abrir {
+      font-size: 12px;
+      color: #2a5298;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+
+    .card.admin       { border-left-color: #e67e22; }
+    .card.pessoas     { border-left-color: #16a085; }
+    .card.musicas     { border-left-color: #8e44ad; }
+    .card.portugues   { border-left-color: #2980b9; }
+    .card.redacao     { border-left-color: #c0392b; }
+    .card.rlm         { border-left-color: #27ae60; }
+    .card.matematica  { border-left-color: #d35400; }
+    .card.constit     { border-left-color: #34495e; }
+    .card.administ    { border-left-color: #7f8c8d; }
+    .card.arquivo     { border-left-color: #b8860b; }
+    .card.informatica { border-left-color: #0097a7; }
+    .card.etica       { border-left-color: #6a1b9a; }
+    .card.v1          { border-left-color: #e91e63; }
+    .card.v2          { border-left-color: #00bcd4; }
+    .card.v3          { border-left-color: #ff9800; }
+    .card.v4          { border-left-color: #4caf50; }
+    .card.v5          { border-left-color: #9c27b0; }
+    .card.v6          { border-left-color: #607d8b; }
+
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 12px;
+      color: #999;
+      background: #fff;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    @media (max-width: 760px) {
+      aside { width: 100%; display: flex; flex-wrap: wrap; gap: 4px; padding: 12px; }
+      aside h2 { width: 100%; margin: 4px 10px; }
+      aside a { flex: 1 1 auto; text-align: center; margin-bottom: 0; padding: 8px; }
+      main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📚 Área de Estudos <span>— acesso restrito</span></h1>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </header>
+
+  <div class="layout">
+
+    <aside>
+      <h2>Navegação</h2>
+      <a href="#conteudo" onclick="irPara('conteudo')">🏠 Topo</a>
+      <a href="#conteudo" onclick="irPara('admin')">🏢 Administração</a>
+      <a href="#conteudo" onclick="irPara('pessoas')">👥 Gestão de Pessoas</a>
+      <a href="#conteudo" onclick="irPara('musicas')">🎵 Músicas</a>
+      <a href="#conteudo" onclick="irPara('portugues')">📖 Português</a>
+      <a href="#conteudo" onclick="irPara('redacao')">✍️ Redação</a>
+      <a href="#conteudo" onclick="irPara('rlm')">🧮 RLM</a>
+      <a href="#conteudo" onclick="irPara('matematica')">➗ Matemática</a>
+      <a href="#conteudo" onclick="irPara('constit')">⚖️ Dir. Constitucional</a>
+      <a href="#conteudo" onclick="irPara('administ')">📋 Dir. Administrativo</a>
+      <a href="#conteudo" onclick="irPara('arquivo')">🗂️ Arquivologia</a>
+      <a href="#conteudo" onclick="irPara('informatica')">💻 Informática</a>
+      <a href="#conteudo" onclick="irPara('etica')">🧭 Ética</a>
+      <a href="#conteudo" onclick="irPara('v1')">➕ Futura 1</a>
+      <a href="#conteudo" onclick="irPara('v2')">➕ Futura 2</a>
+      <a href="#conteudo" onclick="irPara('v3')">➕ Futura 3</a>
+      <a href="#conteudo" onclick="irPara('v4')">➕ Futura 4</a>
+      <a href="#conteudo" onclick="irPara('v5')">➕ Futura 5</a>
+      <a href="#conteudo" onclick="irPara('v6')">➕ Futura 6</a>
+    </aside>
+
+    <main id="conteudo">
+      <h2>Bem-vindo(a)! 👋</h2>
+      <p class="sub">Escolha uma das disciplinas abaixo para abrir no Mega.</p>
+
+      <div class="grid">
+
+        <a class="card admin" id="admin"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9pZTR3emJqRCMxRFpxN3VtREdFb29wVkpqRUlIMWlR"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">🏢</div>
+            <div class="titulo">Administração</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card pessoas" id="pessoas"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9EWG9Fd0E0SiM4emMzLW5OZDNIbkx4eUNRWUpDV1B3"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">👥</div>
+            <div class="titulo">Gestão de Pessoas</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card musicas" id="musicas"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci8yWFJEUUk2WiNpajBud2xOdC1ZLU9iblZpOGVYcHRB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">🎵</div>
+            <div class="titulo">Músicas</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card portugues" id="portugues"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci91S1l4VER5YSM2a0IwanRnRkRCcFRrZG00SGdqYXZn"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📖</div>
+            <div class="titulo">Português</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card redacao" id="redacao"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9tSzVnWFF3QSNNWkQza210ajlBbzBmWllpSWpYVzdB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">✍️</div>
+            <div class="titulo">Redação</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card rlm" id="rlm"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci95YmhSeEJDTCNOd1lyUnhQVlBMQXVlU0FXMTBfbFp3"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">🧮</div>
+            <div class="titulo">RLM</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card matematica" id="matematica"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9iYXhTSFpBSiNjRWx5c0pnMWlISlhzTVRRVjVaV2xB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">➗</div>
+            <div class="titulo">Matemática</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card constit" id="constit"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9XUHczWFlnWiNCOVRnV3RoY29ma0MyNDFlMlBQZUtB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">⚖️</div>
+            <div class="titulo">Direito Constitucional</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card administ" id="administ"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9XUHczWFlnWiNCOVRnV3RoY29ma0MyNDFlMlBQZUtB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📋</div>
+            <div class="titulo">Direito Administrativo</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card arquivo" id="arquivo"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9pTHBnMUlDQiNiVmJla0tBWERRclZ3cGRIYjdYQUtR"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">🗂️</div>
+            <div class="titulo">Arquivologia</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card informatica" id="informatica"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9uQzVTalJDWiNXS1ZlU3l3b1h0VFdfWDJZZXY2YUJn"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">💻</div>
+            <div class="titulo">Informática</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card etica" id="etica"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9DZXd5R1Q3QyNoOEdGTjhxckxBTDhBRGZmVXNPaFZB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">🧭</div>
+            <div class="titulo">Ética</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card v1" id="v1"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9DYkJCV0k0YiM0d0FPeEdXT0ZHNXNLLXdSSHFMcDd3"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📘</div>
+            <div class="titulo">Disciplina Futura 1</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card v2" id="v2"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci82UGgzMUJ6YiNsUlp5XzhMc1czWVVDeFUxckE4c0ZB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📗</div>
+            <div class="titulo">Disciplina Futura 2</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card v3" id="v3"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9XYUpUakFUSSNVMjVTZmJoYW5vd0FfbUpuNnh1WXdn"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📙</div>
+            <div class="titulo">Disciplina Futura 3</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card v4" id="v4"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9uYVpWa0k3YSNKOTFtXzh3a1hhSDh0N1l4dUxkOVdR"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📕</div>
+            <div class="titulo">Disciplina Futura 4</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card v5" id="v5"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci9mT3dVakNoUiNDYjdSeGlvLTJIUjZmczJBeFJZVmhB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📓</div>
+            <div class="titulo">Disciplina Futura 5</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+        <a class="card v6" id="v6"
+           data-link="aHR0cHM6Ly9tZWdhLm56L2ZvbGRlci92VzRYVkJ5QyNTZHNwVzB2anZ4dTlmRGppcTk3RlZB"
+           onclick="abrirLink(this); return false;">
+          <div>
+            <div class="icone">📔</div>
+            <div class="titulo">Disciplina Futura 6</div>
+          </div>
+          <div class="abrir">Abrir no Mega →</div>
+        </a>
+
+      </div>
+    </main>
+  </div>
+
+  <footer>Área restrita · © 2026</footer>
+
+  <script>
+    function abrirLink(elemento) {
+      const codificado = elemento.getAttribute('data-link');
+      if (!codificado) {
+        alert('Link não configurado para este item.');
+        return;
+      }
+
+      let url;
+      try {
+        url = atob(codificado.replace(/\s/g, ''));
+      } catch (e) {
+        console.error('❌ Base64 inválido no card:', elemento.id, '→', codificado);
+        alert('Não foi possível abrir este link. Verifique o console (F12).');
+        return;
+      }
+
+      // Abre via <a> temporário — mais confiável que window.open com o Mega
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function sair() {
+      sessionStorage.removeItem('autorizado');
+      window.location.href = 'login.html';
+    }
+
+    function irPara(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.outline = '3px solid #2a5298';
+        setTimeout(() => el.style.outline = 'none', 1200);
+      }
+    }
+  </script>
+</body>
+</html>

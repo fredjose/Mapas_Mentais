@@ -7,7 +7,7 @@
   <script>
     // 🔒 Trava: só abre se veio do login
     if (sessionStorage.getItem('autorizado') !== 'sim') {
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
     }
   </script>
   <style>
@@ -400,7 +400,7 @@
         url = atob(codificado.replace(/\s/g, ''));
       } catch (e) {
         console.error('❌ Base64 inválido no card:', elemento.id, '→', codificado);
-        alert('Não foi possível abrir este link. Verifique o console (F12).');
+        alert('Não foi possível abrir este link.');
         return;
       }
 
@@ -416,7 +416,7 @@
 
     function sair() {
       sessionStorage.removeItem('autorizado');
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
     }
 
     function irPara(id) {
